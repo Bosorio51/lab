@@ -14,7 +14,7 @@ type ItemPickerProps = {
 
 const MAX_ROWS = 50;
 
-// Search box and a list of big rows to choose an item from. Matches the name or SKU as typed
+// Search box and a list of big rows to choose an item from. Matches the name, SKU or barcode as typed
 // (any part, any case); with nothing typed it lists the first items alphabetically.
 export function ItemPicker({ onSelect, hideOnHand, onCreate }: ItemPickerProps) {
   const styles = useStyles();
@@ -23,7 +23,7 @@ export function ItemPicker({ onSelect, hideOnHand, onCreate }: ItemPickerProps) 
 
   const needle = search.trim().toLowerCase();
   const matches = (needle
-    ? items.filter((item) => [item.name, item.sku].some((text) => text.toLowerCase().includes(needle)))
+    ? items.filter((item) => [item.name, item.sku, item.barcode].some((text) => text.toLowerCase().includes(needle)))
     : items
   ).slice(0, MAX_ROWS);
 
@@ -33,8 +33,8 @@ export function ItemPicker({ onSelect, hideOnHand, onCreate }: ItemPickerProps) 
         className={styles.search}
         size="large"
         type="search"
-        placeholder="Search name or SKU"
-        aria-label="Search items"
+        placeholder="Search name, SKU or barcode"
+        aria-label="Search items by name, SKU or barcode"
         contentBefore={<SearchRegular />}
         value={search}
         onChange={(_, data) => setSearch(data.value)}

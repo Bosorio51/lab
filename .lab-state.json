@@ -12,5 +12,6 @@
   "devOrgId": "fbc72b89-98d0-f111-a04e-6045bd00310c",
   "devProfile": "dev",
   "testEnvUrl": "https://wm-test-3379.crm.dynamics.com",
-  "testProfile": "test"
+  "testProfile": "test",
+  "appId": "12eb85b3-590e-4a06-93ef-9d3be63d5b18"
 }

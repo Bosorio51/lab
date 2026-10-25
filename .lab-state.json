@@ -13,5 +13,8 @@
   "devProfile": "dev",
   "testEnvUrl": "https://wm-test-3379.crm.dynamics.com",
   "testProfile": "test",
-  "appId": "12eb85b3-590e-4a06-93ef-9d3be63d5b18"
+  "appId": "12eb85b3-590e-4a06-93ef-9d3be63d5b18",
+  "packageDeployerScaffolded": true,
+  "dataModelScaffolded": true,
+  "columnsScaffolded": true
 }

@@ -6,5 +6,11 @@
   "publisherPrefix": "lab",
   "repo": "Bosorio51/lab",
   "mainRulesetId": 25828863,
-  "mainRulesetName": "lab-main-protection"
+  "mainRulesetName": "lab-main-protection",
+  "devEnvUrl": "https://wm-dev-3379.crm.dynamics.com",
+  "devEnvId": "90a5e5d4-da43-ea0a-ab13-1939602f1502",
+  "devOrgId": "fbc72b89-98d0-f111-a04e-6045bd00310c",
+  "devProfile": "dev",
+  "testEnvUrl": "https://wm-test-3379.crm.dynamics.com",
+  "testProfile": "test"
 }

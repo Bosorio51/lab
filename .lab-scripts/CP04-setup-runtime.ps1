@@ -27,6 +27,35 @@ Write-Step "CP04 — Runtime environments (Dev + Test)"
 
 $rid = Initialize-RandomIdentifier
 
+function Invoke-SettingSetWithRetry {
+    param(
+        [Parameter(Mandatory)][string]$Profile,
+        [Parameter(Mandatory)][string]$SettingName,
+        [Parameter(Mandatory)][string]$SettingValue,
+        [int]$MaxAttempts = 10,
+        [int]$RetrySeconds = 60
+    )
+
+    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+        $output = & txc env setting set $SettingName $SettingValue --profile $Profile 2>&1
+        $code = $LASTEXITCODE
+        if ($code -eq 0) {
+            return $output
+        }
+
+        $text = ($output | Out-String)
+        if ($text -match '429|Too Many Requests') {
+            if ($attempt -lt $MaxAttempts) {
+                Write-Warn2 "Rate-limited while setting $SettingName on profile $Profile (attempt $attempt/$MaxAttempts). Retrying in $RetrySeconds seconds..."
+                Start-Sleep -Seconds $RetrySeconds
+                continue
+            }
+        }
+
+        throw "Failed to set $SettingName on profile $Profile after $attempt attempt(s): $text"
+    }
+}
+
 function Get-ConnectionByIdOrUrl {
     param(
         [object[]]$Connections,
@@ -125,8 +154,14 @@ foreach ($key in $envs.Keys) {
     Write-Ok "$key ready: $url"
 
     # Code apps are off by default; the Warehouse Picking code app won't run without them.
-    txc env setting set PowerApps_AllowCodeApps true --profile $key 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) { Write-Err "Failed to enable code apps on $key"; exit 1 }
+    # The control-plane API can temporarily return HTTP 429 while a new environment is warming up,
+    # so retry a few times instead of failing immediately.
+    try {
+        Invoke-SettingSetWithRetry -Profile $key -SettingName 'PowerApps_AllowCodeApps' -SettingValue 'true'
+    } catch {
+        Write-Err "Failed to enable code apps on ${key}: $($_.Exception.Message)"
+        exit 1
+    }
 }
 
 # Pin the dev profile as default for local deploys.

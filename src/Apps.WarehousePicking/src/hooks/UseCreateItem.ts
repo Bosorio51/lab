@@ -8,6 +8,8 @@ import { servicePayload, serviceResult } from "@/utils/ServicePayload";
 type CreateItemInput = {
   /** The New item form's values. */
   values: Record<string, unknown>;
+  /** From a catalog lookup: makes the catalog record the new item is linked to. */
+  ensureProductId?: () => Promise<string | undefined>;
 };
 
 // Creates a warehouse item at 0 on hand (the Inbound transaction that follows books the received
@@ -17,7 +19,8 @@ export function useCreateItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ values }: CreateItemInput): Promise<PickItem> => {
+    mutationFn: async ({ values, ensureProductId }: CreateItemInput): Promise<PickItem> => {
+      const productId = await ensureProductId?.();
       // The items listed before the create: the new one is the match that isn't among them
       const known = new Set(
         (queryClient.getQueryData<Lab_warehouseitems[]>(PICK_ITEMS_KEY) ?? []).map((item) => item.lab_warehouseitemid)
@@ -27,10 +30,12 @@ export function useCreateItem() {
           lab_name: values.lab_name,
           lab_sku: values.lab_sku,
           lab_category: Number(values.lab_category),
+          lab_barcode: values.lab_barcode || undefined,
           lab_availablequantity: "0",
           ...(values.lab_locationid
             ? { "lab_locationid@odata.bind": `/lab_warehouselocations(${values.lab_locationid})` }
             : {}),
+          ...(productId ? { "lab_productid@odata.bind": `/lab_products(${productId})` } : {}),
         })
       ));
 
@@ -48,3 +53,4 @@ export function useCreateItem() {
     },
   });
 }
+

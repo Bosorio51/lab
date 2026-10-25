@@ -6,4 +6,10 @@ export const useStyles = makeStyles({
     flexDirection: "column",
     gap: tokens.spacingVerticalL,
   },
+  scan: {
+    minHeight: "64px",
+    fontSize: tokens.fontSizeBase400,
+    fontWeight: tokens.fontWeightSemibold,
+  },
 });
+
